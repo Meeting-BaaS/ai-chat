@@ -10,7 +10,7 @@ import { useChat } from '@ai-sdk/react';
 import type { Attachment, UIMessage } from 'ai';
 import { AnimatePresence } from 'motion/react';
 import * as motion from 'motion/react-client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import useSWR, { useSWRConfig } from 'swr';
 import { unstable_serialize } from 'swr/infinite';
@@ -19,6 +19,7 @@ import { Greeting } from '../greeting';
 import { Messages } from './messages';
 import { MultimodalInput } from './multimodal-input';
 import type { VisibilityType } from './visibility-selector';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export function Chat({
   id,
@@ -27,6 +28,7 @@ export function Chat({
   selectedVisibilityType,
   isReadonly,
   user,
+  initialInput,
 }: {
   id: string;
   initialMessages: Array<UIMessage>;
@@ -34,8 +36,11 @@ export function Chat({
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
   user: User | undefined;
+  initialInput?: string;
 }) {
   const { mutate } = useSWRConfig();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     messages,
@@ -61,6 +66,20 @@ export function Chat({
       toast.error('An error occurred, please try again!');
     },
   });
+
+  // Set initial input if provided
+  useEffect(() => {
+    if (initialInput) {
+      setInput(initialInput);
+
+      // Remove the new_chat_message from the search params after setting the input
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('new_chat_message');
+      router.replace(`?${newSearchParams.toString()}`, {
+        scroll: false,
+      });
+    }
+  }, [initialInput, setInput, router, searchParams, id]);
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,

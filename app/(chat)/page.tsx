@@ -6,12 +6,15 @@ import { generateUUID } from '@/lib/utils';
 import { DataStreamHandler } from '@/components/data-stream-handler';
 import { getAuthSession } from '@/lib/auth/session';
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: { searchParams: Promise<{ new_chat_message: string }> }) {
   const id = generateUUID();
 
-  const [session, cookieStore] = await Promise.all([
+  const [session, cookieStore, reqSearchParams] = await Promise.all([
     getAuthSession(),
     cookies(),
+    searchParams,
   ]);
   const modelIdFromCookie = cookieStore.get('chat-model');
 
@@ -26,6 +29,7 @@ export default async function Page() {
           selectedVisibilityType="private"
           isReadonly={false}
           user={session?.user}
+          initialInput={reqSearchParams.new_chat_message}
         />
         <DataStreamHandler id={id} />
       </>
@@ -42,6 +46,7 @@ export default async function Page() {
         selectedVisibilityType="private"
         isReadonly={false}
         user={session?.user}
+        initialInput={reqSearchParams.new_chat_message}
       />
       <DataStreamHandler id={id} />
     </>
