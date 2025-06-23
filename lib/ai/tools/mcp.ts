@@ -8,10 +8,6 @@ let privateClient: MCPClientType | null = null;
 let speakingClient: MCPClientType | null = null;
 let docsClient: MCPClientType | null = null;
 
-const environment = process.env.ENVIRONMENT || '';
-// Add a dot for proper subdomain formatting if environment is not empty
-const envPrefix = environment ? `${environment}.` : '';
-
 export async function getMCPTools() {
   const baasSession = await meetingBaas.auth();
   if (!baasSession?.jwt || !baasSession?.apiKey) {
@@ -35,7 +31,7 @@ export async function getMCPTools() {
       privateClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp-private.${envPrefix}meetingbaas.com/sse`,
+          url: `https://mcp-private.meetingbaas.com/sse`,
           headers: {
             Cookie: `jwt=${baasSession.jwt}`,
           },
@@ -60,7 +56,7 @@ export async function getMCPTools() {
       publicClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp.${envPrefix}meetingbaas.com/sse`,
+          url: `https://mcp.meetingbaas.com/sse`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
           },
@@ -85,7 +81,7 @@ export async function getMCPTools() {
       speakingClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://speaking.${envPrefix}meetingbaas.com/sse`,
+          url: `https://speaking.meetingbaas.com/sse`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
           },
@@ -132,7 +128,12 @@ export async function getMCPTools() {
     privateTools,
     speakingTools,
     docsTools,
-    allTools: { ...publicTools, ...privateTools, ...speakingTools, ...docsTools },
+    allTools: {
+      ...publicTools,
+      ...privateTools,
+      ...speakingTools,
+      ...docsTools,
+    },
   };
 }
 

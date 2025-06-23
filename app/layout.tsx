@@ -2,13 +2,68 @@ import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
-
+import { headers } from 'next/headers';
+import NotFound from '@/app/not-found';
+import { isbot } from 'isbot';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.meetingbaas.com'),
-  title: 'Baas Chat - by MeetingBaas',
-  description: 'An AI Chatbot that can answer questions related to MeetingBaas',
+  title: 'BaaS Chat | Meeting BaaS',
+  description:
+    'Chat with our API using natural language. Send bots, debug issues, and try all functionalities from our MCP servers.',
+  keywords: [
+    'Meeting BaaS',
+    'BaaS Chat',
+    'AI Chat',
+    'LLM Agent',
+    'MCP',
+    'meeting bot',
+    'Google Meet',
+    'Teams',
+    'Zoom',
+  ],
+  authors: [{ name: 'Meeting BaaS Team' }],
+  openGraph: {
+    type: 'website',
+    title: 'BaaS Chat | Meeting BaaS',
+    description:
+      'Chat with our API using natural language. Send bots, debug issues, and try all functionalities from our MCP servers.',
+    siteName: 'Meeting BaaS',
+    url: 'https://chat.meetingbaas.com',
+    locale: 'en_US',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Meeting BaaS Chat',
+        type: 'image/png',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BaaS Chat | Meeting BaaS',
+    description:
+      'Chat with our API using natural language. Send bots, debug issues, and try all functionalities from our MCP servers.',
+    images: ['/og-image.png'],
+    creator: '@MeetingBaas',
+    site: '@MeetingBaas',
+  },
+  category: 'Video Conferencing Tools',
+  applicationName: 'Meeting BaaS',
+  creator: 'Meeting BaaS',
+  publisher: 'Meeting BaaS',
+  referrer: 'origin-when-cross-origin',
+  // This is a private app, so we can't index it
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export const viewport = {
@@ -52,6 +107,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const requestHeaders = await headers();
+  const userAgent = requestHeaders.get('user-agent');
+  // If the request is from a bot, show the not found page (Since this is a private app, we don't want bots to access it)
+  // This is to prevent bots from being redirected to the auth app
+  if (isbot(userAgent)) {
+    return <NotFound />;
+  }
+
   return (
     <html
       lang="en"
@@ -69,7 +132,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className="flex min-h-screen flex-col antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -74,6 +75,10 @@ export const UserMenu = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48">
+        <DropdownMenuLabel className="truncate text-muted-foreground first-letter:uppercase">
+          {user.email}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           className="hover:!bg-popover inline-flex w-full justify-between py-1"
           onSelect={(e) => e.preventDefault()}
