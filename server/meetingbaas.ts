@@ -8,7 +8,16 @@ export async function auth() {
 
   if (!jwt) return null;
 
-  const response = await fetch(`https://api.meetingbaas.com/accounts/api_key`, {
+  const apiUrl = process.env.API_SERVER_BASEURL;
+
+  if (!apiUrl) {
+    console.error(
+      'API_SERVER_BASEURL is not set. Please add it to the environment configuration.',
+    );
+    return { jwt: null, apiKey: null };
+  }
+
+  const response = await fetch(`${apiUrl}/accounts/api_key`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
