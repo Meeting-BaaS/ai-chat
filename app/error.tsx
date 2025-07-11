@@ -50,7 +50,7 @@ export default function ErrorBoundary({ error }: ErrorProps) {
         </div>
       </div>
       <motion.div
-        className="-translate-1/2 absolute top-1/2 left-1/2 h-64 w-64 rounded-full blur-3xl"
+        className="-translate-y-1/2 absolute top-1/2  h-64 w-64 rounded-full blur-3xl"
         style={{
           background:
             'radial-gradient(circle, rgba(0, 219, 205, 0.3) 10%, rgba(0, 219, 205, 0.2) 80%, transparent 100%)',

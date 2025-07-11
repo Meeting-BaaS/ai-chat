@@ -1,6 +1,11 @@
 import * as meetingBaas from '@/server/meetingbaas';
 import { experimental_createMCPClient as createMCPClient } from 'ai';
 
+// Meeting BaaS environment header for MCP servers. For lower environments, it would be something like pre-prod-
+// It would be empty for prod.
+// It determines which API server will the MCP client connect to.
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || '';
+
 // Keep track of active clients
 type MCPClientType = Awaited<ReturnType<typeof createMCPClient>>;
 let publicClient: MCPClientType | null = null;
@@ -31,7 +36,7 @@ export async function getMCPTools() {
       privateClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp-private.meetingbaas.com/sse`,
+          url: `https://mcp-private.meetingbaas.com/sse?environment=${environment}`,
           headers: {
             Cookie: `jwt=${baasSession.jwt}`,
           },
@@ -56,7 +61,7 @@ export async function getMCPTools() {
       publicClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp.meetingbaas.com/sse`,
+          url: `https://mcp.meetingbaas.com/sse?environment=${environment}`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
           },
@@ -81,7 +86,7 @@ export async function getMCPTools() {
       speakingClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://speaking.meetingbaas.com/sse`,
+          url: `https://speaking.meetingbaas.com/sse?environment=${environment}`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
           },
@@ -106,7 +111,7 @@ export async function getMCPTools() {
       docsClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: 'https://mcp-documentation.meetingbaas.com/sse',
+          url: 'https://mcp-documentation.meetingbaas.com/sse', // No environment parameter needed for docs MCP server because it doesn't use the API server
         },
         onUncaughtError: (error) => {
           console.error('Docs MCP Client error:', error);
