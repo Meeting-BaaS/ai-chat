@@ -10,13 +10,10 @@ interface LayoutRootProps {
 }
 
 export default function LayoutRoot({ children, session }: LayoutRootProps) {
-  if (!session) {
-    return null;
-  }
   return (
     <>
       <AppSidebar variant="inset" user={session.user} />
-      <SidebarInset className="md:peer-data-[variant=inset]:shadow-none transition-transition-[width,height] md:peer-data-[variant=inset]:rounded-b-none md:peer-data-[variant=inset]:mb-0">
+      <SidebarInset className="md:peer-data-[variant=inset]:shadow-none transition-[width,height] md:peer-data-[variant=inset]:rounded-b-none md:peer-data-[variant=inset]:mb-0">
         {children}
       </SidebarInset>
     </>

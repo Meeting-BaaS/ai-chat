@@ -149,11 +149,11 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <Script
-        src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
-        strategy="beforeInteractive"
-      />
       <body className="flex min-h-screen flex-col antialiased">
+        <Script
+          src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
+          strategy="beforeInteractive"
+        />
         <Providers jwt={jwt} isCollapsed={isCollapsed} initialSession={session}>
           <LayoutRoot session={session}>{children}</LayoutRoot>
           <Toaster position="top-center" />
