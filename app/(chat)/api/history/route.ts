@@ -1,8 +1,10 @@
 import { getAuthSession } from '@/lib/auth/session';
 import type { NextRequest } from 'next/server';
 import { getChatsByUserId } from '@/server/db/queries';
+import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
+  const requestCookies = await cookies();
   const { searchParams } = request.nextUrl;
 
   const limit = Number.parseInt(searchParams.get('limit') || '10');
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session?.user?.id) {
     return Response.json('Unauthorized!', { status: 401 });

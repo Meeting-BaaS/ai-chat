@@ -4,7 +4,7 @@ import * as motion from 'motion/react-client';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Component() {
+export default function NotFound() {
   return (
     <div className="relative flex max-h-screen max-w-screen grow flex-col items-center justify-center">
       <div className="z-10 flex flex-col items-center justify-center gap-10 p-4 text-center">
@@ -25,13 +25,13 @@ export default function Component() {
         </div>
       </div>
       <motion.div
-        className="-translate-y-1/2 absolute top-1/2  h-48 w-48 rounded-full blur-3xl"
+        initial={{ opacity: 0 }}
+        animate={spotlightAnimation}
+        className="-translate-y-1/2 absolute top-1/2  size-48 rounded-full blur-3xl"
         style={{
           background:
             'radial-gradient(circle, rgba(0, 219, 205, 0.3) 10%, rgba(0, 219, 205, 0.2) 80%, transparent 100%)',
         }}
-        initial={{ opacity: 0 }}
-        animate={spotlightAnimation}
         aria-hidden="true"
       />
     </div>

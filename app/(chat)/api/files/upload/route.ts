@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { getAuthSession } from '@/lib/auth/session';
+import { cookies } from 'next/headers';
 
 // Use Blob instead of File since File is not available in Node.js environment
 const FileSchema = z.object({
@@ -22,7 +23,8 @@ const FileSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await getAuthSession();
+  const requestCookies = await cookies();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

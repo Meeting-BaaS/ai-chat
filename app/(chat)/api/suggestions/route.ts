@@ -1,7 +1,9 @@
 import { getAuthSession } from '@/lib/auth/session';
 import { getSuggestionsByDocumentId } from '@/server/db/queries';
+import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
+  const requestCookies = await cookies();
   const { searchParams } = new URL(request.url);
   const documentId = searchParams.get('documentId');
 
@@ -9,7 +11,7 @@ export async function GET(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session || !session.user || !session.user.id) {
     return new Response('Unauthorized', { status: 401 });

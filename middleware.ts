@@ -1,26 +1,16 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { isbot } from 'isbot';
+import { getAuthAppUrl } from '@/lib/auth/auth-app-url';
 
 if (!process.env.AUTH_COOKIE_NAME) {
   throw new Error('AUTH_COOKIE_NAME environment variable is not defined');
 }
 
-if (!process.env.NEXT_PUBLIC_AUTH_APP_URL) {
-  throw new Error(
-    'NEXT_PUBLIC_AUTH_APP_URL environment variable is not defined',
-  );
-}
+const authAppUrl = getAuthAppUrl();
 
 export async function middleware(request: NextRequest) {
   // Skip auth cookie check if disable auth is set to true
   if (process.env.DISABLE_AUTH === 'true') {
-    return NextResponse.next();
-  }
-  const userAgent = request.headers.get('user-agent');
-
-  // If the request is from a bot, let it pass through
-  // This is to prevent bots from being redirected to the auth app
-  if (isbot(userAgent)) {
     return NextResponse.next();
   }
 
@@ -30,7 +20,16 @@ export async function middleware(request: NextRequest) {
   const cookie = authCookieName
     ? request.cookies.get(authCookieName)
     : undefined;
-  const signInUrl = `${process.env.NEXT_PUBLIC_AUTH_APP_URL}/sign-in`;
+  const response = NextResponse.next();
+  const userAgent = request.headers.get('user-agent');
+
+  // If the request is from a bot, let it pass through
+  // This is to prevent bots from being redirected to the auth app
+  if (isbot(userAgent)) {
+    return NextResponse.next();
+  }
+
+  const signInUrl = `${authAppUrl}/sign-in`;
   const appUrl = request.nextUrl.origin;
   const redirectTo = `${appUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
 
@@ -40,7 +39,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(newUrl);
   }
 
-  return NextResponse.next();
+  // Setting a custom header so that RSCs can handle redirection if session not found
+  response.headers.set('x-redirect-to', redirectTo);
+
+  return response;
 }
 
 // skipping static and api routes

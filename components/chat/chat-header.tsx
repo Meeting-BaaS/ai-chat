@@ -11,22 +11,19 @@ import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import Link from 'next/link';
-import { UserMenu } from '@/components/chat/user-avatar/user-menu';
-import type { User } from '@/lib/auth/types';
 import { GITHUB_REPO_URL } from '@/lib/external-urls';
+import { UserMenu } from '@/components/chat/user-avatar/user-menu';
 
 function PureChatHeader({
   chatId,
   selectedModelId,
   selectedVisibilityType,
   isReadonly,
-  user,
 }: {
   chatId: string;
   selectedModelId: string;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
-  user: User | undefined;
 }) {
   const router = useRouter();
   const { open } = useSidebar();
@@ -83,7 +80,7 @@ function PureChatHeader({
           </span>
         </Link>
       </Button>
-      {user && <UserMenu user={user} />}
+      <UserMenu />
     </header>
   );
 }

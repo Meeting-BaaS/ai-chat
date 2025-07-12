@@ -5,6 +5,8 @@ import { experimental_createMCPClient as createMCPClient } from 'ai';
 // It would be empty for prod.
 // It determines which API server will the MCP client connect to.
 const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || '';
+const searchParams = new URLSearchParams();
+searchParams.set('environment', environment);
 
 // Keep track of active clients
 type MCPClientType = Awaited<ReturnType<typeof createMCPClient>>;
@@ -36,7 +38,7 @@ export async function getMCPTools() {
       privateClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp-private.meetingbaas.com/sse?environment=${environment}`,
+          url: `https://mcp-private.meetingbaas.com/sse?${searchParams.toString()}`,
           headers: {
             Cookie: `jwt=${baasSession.jwt}`,
           },
@@ -61,7 +63,7 @@ export async function getMCPTools() {
       publicClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp.meetingbaas.com/sse?environment=${environment}`,
+          url: `https://mcp.meetingbaas.com/sse?${searchParams.toString()}`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
           },
@@ -86,7 +88,7 @@ export async function getMCPTools() {
       speakingClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://speaking.meetingbaas.com/sse?environment=${environment}`,
+          url: `https://speaking.meetingbaas.com/sse?${searchParams.toString()}`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
           },

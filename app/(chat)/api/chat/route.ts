@@ -28,10 +28,12 @@ import {
   streamText,
 } from 'ai';
 import { generateTitleFromUserMessage } from '../../actions';
+import { cookies } from 'next/headers';
 
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
+  const requestCookies = await cookies();
   try {
     const {
       id,
@@ -43,7 +45,7 @@ export async function POST(request: Request) {
       selectedChatModel: string;
     } = await request.json();
 
-    const session = await getAuthSession();
+    const session = await getAuthSession(requestCookies.toString());
     const baasSession = await meetingBaas.auth();
 
     if (!session || !session.user || !session.user.id) {
@@ -183,6 +185,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const requestCookies = await cookies();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
@@ -190,7 +193,7 @@ export async function DELETE(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session || !session.user || !session.user.id) {
     return new Response('Unauthorized', { status: 401 });

@@ -4,7 +4,6 @@ import { LoaderIcon, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment, useState } from 'react';
 import { menuOptions } from '@/components/chat/user-avatar/menu-options';
-import type { User } from '@/lib/auth/types';
 import { signOut } from '@/lib/auth/sign-out';
 import {
   DropdownMenu,
@@ -17,13 +16,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { useSession } from '@/hooks/use-session';
 
-export const UserMenu = ({
-  user,
-}: {
-  user: User;
-}) => {
+export const UserMenu = () => {
+  const session = useSession();
   const [loading, setLoading] = useState(false);
+
+  if (!session) {
+    return null;
+  }
+
+  const { user } = session;
 
   const onSignOut = async () => {
     setLoading(true);

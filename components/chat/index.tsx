@@ -3,7 +3,6 @@
 import { ChatHeader } from '@/components/chat/chat-header';
 import { getChatHistoryPaginationKey } from '@/components/sidebar/sidebar-history';
 import { useArtifactSelector } from '@/hooks/use-artifact';
-import type { User } from '@/lib/auth/types';
 import { cn, fetcher, generateUUID } from '@/lib/utils';
 import type { Vote } from '@/server/db/schema';
 import { useChat } from '@ai-sdk/react';
@@ -27,7 +26,6 @@ export function Chat({
   selectedChatModel,
   selectedVisibilityType,
   isReadonly,
-  user,
   initialInput,
 }: {
   id: string;
@@ -35,7 +33,6 @@ export function Chat({
   selectedChatModel: string;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
-  user: User | undefined;
   initialInput?: string;
 }) {
   const { mutate } = useSWRConfig();
@@ -84,6 +81,10 @@ export function Chat({
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
     fetcher,
+    {
+      revalidateOnFocus: !isReadonly, // Only revalidate if the chat is not readonly
+      revalidateOnMount: !isReadonly, // Only revalidate if the chat is not readonly
+    },
   );
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
@@ -97,7 +98,6 @@ export function Chat({
           selectedModelId={selectedChatModel}
           selectedVisibilityType={selectedVisibilityType}
           isReadonly={isReadonly}
-          user={user}
         />
 
         <div

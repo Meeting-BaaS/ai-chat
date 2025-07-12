@@ -1,12 +1,11 @@
+import { getAuthAppUrl } from '@/lib/auth/auth-app-url';
+
 /**
  * Function to sign out from auth app. Called from Client
  */
 export async function signOut(): Promise<boolean> {
   try {
-    const authAppUrl = process.env.NEXT_PUBLIC_AUTH_APP_URL;
-    if (!authAppUrl) {
-      throw new Error('Auth app URL is not configured');
-    }
+    const authAppUrl = getAuthAppUrl();
 
     const response = await fetch(`${authAppUrl}/api/auth/sign-out`, {
       method: 'POST',
@@ -14,7 +13,9 @@ export async function signOut(): Promise<boolean> {
       credentials: 'include',
     });
     if (!response.ok) {
-      throw new Error(`Sign out failed with status: ${response.status}`);
+      throw new Error(
+        `Sign out failed: ${response.status} ${response.statusText}`,
+      );
     }
 
     return true;

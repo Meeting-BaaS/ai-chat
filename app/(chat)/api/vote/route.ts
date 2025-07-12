@@ -4,8 +4,10 @@ import {
   getVotesByChatId,
   voteMessage,
 } from '@/server/db/queries';
+import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
+  const requestCookies = await cookies();
   const { searchParams } = new URL(request.url);
   const chatId = searchParams.get('chatId');
 
@@ -13,7 +15,7 @@ export async function GET(request: Request) {
     return new Response('chatId is required', { status: 400 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session || !session.user || !session.user.id) {
     return new Response('Unauthorized', { status: 401 });
@@ -35,6 +37,7 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const requestCookies = await cookies();
   const {
     chatId,
     messageId,
@@ -46,7 +49,7 @@ export async function PATCH(request: Request) {
     return new Response('messageId and type are required', { status: 400 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session || !session.user || !session.user.id) {
     return new Response('Unauthorized', { status: 401 });

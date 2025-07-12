@@ -5,8 +5,10 @@ import {
   getDocumentsById,
   saveDocument,
 } from '@/server/db/queries';
+import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
+  const requestCookies = await cookies();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
@@ -14,7 +16,7 @@ export async function GET(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });
@@ -36,6 +38,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const requestCookies = await cookies();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
@@ -43,7 +46,7 @@ export async function POST(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });
@@ -78,6 +81,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const requestCookies = await cookies();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   const timestamp = searchParams.get('timestamp');
@@ -90,7 +94,7 @@ export async function DELETE(request: Request) {
     return new Response('Missing timestamp', { status: 400 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session?.user?.id) {
     return new Response('Unauthorized', { status: 401 });
