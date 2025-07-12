@@ -5,8 +5,6 @@ import { experimental_createMCPClient as createMCPClient } from 'ai';
 // It would be empty for prod.
 // It determines which API server will the MCP client connect to.
 const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || '';
-const searchParams = new URLSearchParams();
-searchParams.set('environment', environment);
 
 // Keep track of active clients
 type MCPClientType = Awaited<ReturnType<typeof createMCPClient>>;
@@ -38,9 +36,10 @@ export async function getMCPTools() {
       privateClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp-private.meetingbaas.com/sse?${searchParams.toString()}`,
+          url: `https://mcp-private.meetingbaas.com/sse`,
           headers: {
             Cookie: `jwt=${baasSession.jwt}`,
+            'x-environment': environment,
           },
         },
         onUncaughtError: (error) => {
@@ -63,9 +62,10 @@ export async function getMCPTools() {
       publicClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://mcp.meetingbaas.com/sse?${searchParams.toString()}`,
+          url: `https://mcp.meetingbaas.com/sse`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
+            'x-environment': environment,
           },
         },
         onUncaughtError: (error) => {
@@ -88,9 +88,10 @@ export async function getMCPTools() {
       speakingClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://speaking.meetingbaas.com/sse?${searchParams.toString()}`,
+          url: `https://speaking.meetingbaas.com/sse`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
+            'x-environment': environment,
           },
         },
         onUncaughtError: (error) => {
@@ -114,6 +115,9 @@ export async function getMCPTools() {
         transport: {
           type: 'sse',
           url: 'https://mcp-documentation.meetingbaas.com/sse', // No environment parameter needed for docs MCP server because it doesn't use the API server
+          headers: {
+            'x-environment': environment,
+          },
         },
         onUncaughtError: (error) => {
           console.error('Docs MCP Client error:', error);

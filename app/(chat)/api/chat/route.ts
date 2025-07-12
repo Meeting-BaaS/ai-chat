@@ -31,6 +31,10 @@ import { generateTitleFromUserMessage } from '../../actions';
 import { cookies } from 'next/headers';
 
 export const maxDuration = 60;
+// Meeting BaaS environment header for MCP servers. For lower environments, it would be something like pre-prod-
+// It would be empty for prod.
+// It determines which API server will the MCP client connect to.
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || '';
 
 export async function POST(request: Request) {
   const requestCookies = await cookies();
@@ -88,6 +92,9 @@ export async function POST(request: Request) {
     const { allTools: mcpTools } = await getMCPTools();
 
     return createDataStreamResponse({
+      headers: {
+        'x-environment': environment,
+      },
       execute: async (dataStream) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
