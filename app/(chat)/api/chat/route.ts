@@ -28,10 +28,16 @@ import {
   streamText,
 } from 'ai';
 import { generateTitleFromUserMessage } from '../../actions';
+import { cookies } from 'next/headers';
 
 export const maxDuration = 60;
+// Meeting BaaS environment header for MCP servers. For lower environments, it would be something like pre-prod-
+// It would be empty for prod.
+// It determines which API server will the MCP client connect to.
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || '';
 
 export async function POST(request: Request) {
+  const requestCookies = await cookies();
   try {
     const {
       id,
@@ -43,7 +49,7 @@ export async function POST(request: Request) {
       selectedChatModel: string;
     } = await request.json();
 
-    const session = await getAuthSession();
+    const session = await getAuthSession(requestCookies.toString());
     const baasSession = await meetingBaas.auth();
 
     if (!session || !session.user || !session.user.id) {
@@ -86,6 +92,9 @@ export async function POST(request: Request) {
     const { allTools: mcpTools } = await getMCPTools();
 
     return createDataStreamResponse({
+      headers: {
+        'x-environment': environment,
+      },
       execute: async (dataStream) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
@@ -183,6 +192,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const requestCookies = await cookies();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
@@ -190,7 +200,7 @@ export async function DELETE(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await getAuthSession();
+  const session = await getAuthSession(requestCookies.toString());
 
   if (!session || !session.user || !session.user.id) {
     return new Response('Unauthorized', { status: 401 });

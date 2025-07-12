@@ -1,6 +1,6 @@
-import { headers } from 'next/headers';
 import { dummySession } from '@/lib/auth/dummy-session';
 import type { Session } from '@/lib/auth/types';
+import { getAuthAppUrl } from '@/lib/auth/auth-app-url';
 
 /**
  * Checks if authentication is disabled in the current environment
@@ -11,33 +11,27 @@ function isAuthDisabled(): boolean {
 }
 
 /**
- * Function to get session from auth app. Called from RSC/APIs
+ * Function to get session from auth app.
+ * When called from RSC/APIs, cookies need to be passed.
+ * @param cookies - Cookies to pass to the auth app
  * @returns User's session
  */
-export async function getAuthSession(): Promise<Session | null> {
-  const requestHeaders = await headers();
-
+export async function getAuthSession(
+  cookies?: string,
+): Promise<Session | null> {
   // When auth is disabled, a dummy session is returned
   if (isAuthDisabled()) {
     return dummySession;
   }
 
   try {
-    const authAppUrl = process.env.NEXT_PUBLIC_AUTH_APP_URL;
-    if (!authAppUrl) {
-      throw new Error('Auth app URL is not configured', {
-        cause: new Error(
-          `NEXT_PUBLIC_AUTH_APP_URL environment variable is missing or empty`,
-        ),
-      });
-    }
-    const cookie = requestHeaders.get('cookie') || '';
+    const authAppUrl = getAuthAppUrl();
 
     const response = await fetch(`${authAppUrl}/api/auth/get-session`, {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        Cookie: cookie,
+        ...(cookies ? { Cookie: cookies } : {}),
       },
     });
 
@@ -67,7 +61,6 @@ export async function getAuthSession(): Promise<Session | null> {
   } catch (error) {
     console.error('Error fetching auth session:', error, {
       authAppUrl: process.env.NEXT_PUBLIC_AUTH_APP_URL,
-      hasCookie: !!requestHeaders.get('cookie'),
     });
     return null;
   }

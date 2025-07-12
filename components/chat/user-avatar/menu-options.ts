@@ -1,14 +1,16 @@
+import {
+  BILLING_URL,
+  CREDENTIALS_URL,
+  CONSUMPTION_URL,
+  LOGS_URL,
+  SETTINGS_URL,
+} from '@/lib/external-urls';
+
 export type MenuOption = {
   title: string;
   href: string;
   separator?: boolean;
 };
-
-const environment = process.env.ENVIRONMENT || '';
-
-const SETTINGS_URL =
-  process.env.NEXT_PUBLIC_SETTINGS_REDIRECTION_URL ||
-  `https://settings.${environment}meetingbaas.com`;
 
 export const menuOptions: MenuOption[] = [
   {
@@ -17,19 +19,19 @@ export const menuOptions: MenuOption[] = [
   },
   {
     title: 'Credentials',
-    href: `${SETTINGS_URL}/credentials`,
+    href: CREDENTIALS_URL,
     separator: true,
   },
   {
     title: 'Logs',
-    href: `${SETTINGS_URL}/logs`,
+    href: LOGS_URL,
   },
   {
     title: 'Consumption',
-    href: `${SETTINGS_URL}/usage`,
+    href: CONSUMPTION_URL,
   },
   {
     title: 'Billing',
-    href: `${SETTINGS_URL}/billing`,
+    href: BILLING_URL,
   },
 ];
