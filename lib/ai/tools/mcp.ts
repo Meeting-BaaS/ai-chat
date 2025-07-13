@@ -114,7 +114,10 @@ export async function getMCPTools() {
       docsClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: 'https://mcp-documentation.meetingbaas.com/sse',
+          url: 'https://mcp-documentation.meetingbaas.com/sse', // No environment parameter needed for docs MCP server because it doesn't use the API server
+          headers: {
+            'x-environment': environment,
+          },
         },
         onUncaughtError: (error) => {
           console.error('Docs MCP Client error:', error);
