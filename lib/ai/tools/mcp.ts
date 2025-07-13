@@ -88,7 +88,7 @@ export async function getMCPTools() {
       speakingClient = await createMCPClient({
         transport: {
           type: 'sse',
-          url: `https://speaking.meetingbaas.com/sse`,
+          url: `https://speaking-mcp.meetingbaas.com/sse`,
           headers: {
             'x-meeting-baas-api-key': baasSession.apiKey,
             'x-environment': environment,
